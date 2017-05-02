@@ -38,14 +38,15 @@ def process_images(label_file, one_hot=False, num_classes=10):
     for name in label_record:
         # print label_record[name]
         image = Image.open(image_dir + str(label_record[name]) + '/' + name)
-        print("processing %d: " % index + image_dir + str(label_record[name]) + '/' + name)
+        if index % 100 == 0:
+            print("processing %d: " % index + image_dir + str(label_record[name]) + '/' + name)
 
         img_ndarray = numpy.asarray(image, dtype='float32')
         images[index] = numpy.ndarray.flatten(img_ndarray)
         labels[index] = numpy.int(label_record[name])
 
         index = index + 1
-    print(index)
+    print("done: %d" % index)
     num_images = index
     rows = 28
     cols = 28

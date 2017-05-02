@@ -10,7 +10,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
+import numpy as np
 import tensorflow as tf
 import utils.fileUtil as file
 from utils.labelFile2Map import *
@@ -44,6 +44,13 @@ def recordsCreater(label_file, dst_records):
     print("done!")
     writer.close()
 
+def dense_to_one_hot(labels_dense, num_classes):
+  """Convert class labels from scalars to one-hot vectors."""
+  num_labels = labels_dense.shape[0]
+  index_offset = np.arange(num_labels) * num_classes
+  labels_one_hot = np.zeros((num_labels, num_classes))
+  labels_one_hot.flat[index_offset + labels_dense.ravel()] = 1
+  return labels_one_hot
 
 # 读取二进制数据
 def recordsReader(filename):
@@ -63,7 +70,7 @@ def recordsReader(filename):
         }
     )
     image = tf.decode_raw(features['bytesImg'], tf.uint8)
-    image = tf.reshape(image, [imageSZ['rows'], imageSZ['cols']])
+    image = tf.reshape(image, [imageSZ['rows']*imageSZ['cols']])
     label = tf.cast(features['label'], tf.int32)
     return image, label
 
@@ -77,8 +84,8 @@ def test_reader(recordsFile):
         for i in range(1):
             example, l = sess.run([image, label])  # 在会话中取出image和label
             # img = Image.fromarray(example, 'RGB')  # 如果img是RGB图像
-            img = Image.fromarray(example)  # 这里Image是之前提到的
-            img.save('./' + '_'+'Label_' + str(l) + '.jpg')  # 存下图片
+            # img = Image.fromarray(example)
+            # img.save('./' + '_'+'Label_' + str(l) + '.jpg')  # 存下图片
             print(example, l)
         coord.request_stop()
         coord.join(threads)
@@ -86,6 +93,7 @@ def test_reader(recordsFile):
 if __name__ == '__main__':
     test_label_file, test_dst_records = "../MNIST_data/mnist_test/test.txt", "../MNIST_data/mnist_test.tfrecords"
     train_label_file, train_dst_records = "../MNIST_data/mnist_train/train.txt", "../MNIST_data/mnist_train.tfrecords"
-    recordsCreater(test_label_file, test_dst_records)
-    recordsCreater(train_label_file, train_dst_records)
-    test_reader(test_dst_records)
+    # recordsCreater(test_label_file, test_dst_records)
+    # recordsCreater(train_label_file, train_dst_records)
+    # test_reader(test_dst_records)
+    print(dense_to_one_hot(1, 10))
