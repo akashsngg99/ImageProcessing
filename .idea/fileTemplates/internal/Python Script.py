@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2017/5/2 下午5:29
+# @Time    : ${DATE} ${TIME}
 # @Author  : mrlittlepig
 # @Site    : www.mrlittlepig.xyz
-# @File    : testOpencv.py
-# @Software: PyCharm Community Edition
-
+# @File    : ${NAME}.py
+# @Software: ${PRODUCT_NAME}

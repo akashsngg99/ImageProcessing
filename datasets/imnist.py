@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Time    : 2017/4/30 上午10:57
+# @Author  : mrlittlepig
+# @Site    : www.mrlittlepig.xyz
+# @File    : imnist.py
+# @Software: PyCharm Community Edition
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function

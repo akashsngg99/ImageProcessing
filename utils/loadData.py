@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-import cPickle
 import numpy
 import utils.fileUtil as file
 from PIL import Image
 from utils.labelFile2Map import *
+from datasets.imnist import dense_to_one_hot
 
 def process_images(label_file, one_hot=False, num_classes=10):
     if file.getFileName(label_file) == 'train.txt':
@@ -42,4 +42,4 @@ if __name__ == "__main__":
     image_root = "./MNIST_data/"
     train_label = "./MNIST_data/mnist_train/train.txt"
     test_label = "./MNIST_data/mnist_test/test.txt"
-    process_images(image_root, train_label)
+    process_images(train_label, one_hot=True)

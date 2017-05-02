@@ -28,3 +28,5 @@ datasets/__init__.pyc
 *.pyc
 
 loadData.pyc
+
+*.tfrecords
