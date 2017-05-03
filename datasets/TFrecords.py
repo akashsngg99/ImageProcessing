@@ -15,6 +15,7 @@ import tensorflow as tf
 import utils.fileUtil as file
 from utils.labelFile2Map import *
 from PIL import Image
+import six
 
 imageSZ = {'rows': 28, 'cols': 28}
 
@@ -52,6 +53,15 @@ def dense_to_one_hot(labels_dense, num_classes):
   labels_one_hot.flat[index_offset + labels_dense.ravel()] = 1
   return labels_one_hot
 
+def labels_one_hot(labels, num_classes):
+    label_XS = np.empty(len(labels))
+    for i in range(len(labels)):
+        label_XS[i] = np.int(labels[i])
+    return dense_to_one_hot(np.array(label_XS, dtype=np.uint8), num_classes)
+
+def images_modifier(images, labels, batch_size=100):
+    return images.reshape(batch_size, 28*28*1), labels_one_hot(labels, 10)
+
 # 读取二进制数据
 def recordsReader(filename):
     # 创建文件队列,不限读取的数量
@@ -70,7 +80,7 @@ def recordsReader(filename):
         }
     )
     image = tf.decode_raw(features['bytesImg'], tf.uint8)
-    image = tf.reshape(image, [imageSZ['rows']*imageSZ['cols']])
+    image = tf.reshape(image, [imageSZ['rows'] * imageSZ['cols']])
     label = tf.cast(features['label'], tf.int32)
     return image, label
 
@@ -93,7 +103,7 @@ def test_reader(recordsFile):
 if __name__ == '__main__':
     test_label_file, test_dst_records = "../MNIST_data/mnist_test/test.txt", "../MNIST_data/mnist_test.tfrecords"
     train_label_file, train_dst_records = "../MNIST_data/mnist_train/train.txt", "../MNIST_data/mnist_train.tfrecords"
-    # recordsCreater(test_label_file, test_dst_records)
-    # recordsCreater(train_label_file, train_dst_records)
-    # test_reader(test_dst_records)
-    print(dense_to_one_hot(1, 10))
+    recordsCreater(test_label_file, test_dst_records)
+    recordsCreater(train_label_file, train_dst_records)
+    test_reader(test_dst_records)
+    # print(dense_to_one_hot(1, 10))

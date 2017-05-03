@@ -8,13 +8,13 @@
 
 import tensorflow as tf
 import numpy as np
-from datasets.TFrecords import recordsReader
-from datasets.TFrecords import dense_to_one_hot
+from datasets.TFrecords import *
 
 train_records = "./MNIST_data/mnist_train.tfrecords"
 test_records = "./MNIST_data/mnist_test.tfrecords"
 
 img, label = recordsReader(train_records)
+test_img, test_label = recordsReader(test_records)
 
 def compute_accuracy(v_xs, v_ys):
     global prediction
@@ -78,6 +78,7 @@ prediction = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
 # the error between prediction and real data
 cross_entropy = tf.reduce_mean(-tf.reduce_sum(ys * tf.log(prediction),
                                               reduction_indices=[1]))       # loss
+
 train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
 
 sess = tf.Session()
@@ -87,10 +88,17 @@ sess.run(init)
 
 # get 100 images as one training batch
 img_batch, label_batch = tf.train.batch([img, label], batch_size=100, capacity=2000)
-threads = tf.train.start_queue_runners(sess=sess)
+test_img_batch, test_label_batch = tf.train.batch([img, label], batch_size=10000, capacity=10000)
+
+coord = tf.train.Coordinator()
+threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
 for i in range(1000):
-    img_xs, label_xs = sess.run([img_batch, label_batch])
-
-    sess.run(train_step, feed_dict={xs: img_xs, ys: label_xs})
-
+    images, labels = sess.run([img_batch, label_batch])
+    batch_xs, batch_ys = images_modifier(images, labels)
+    # print(batch_xs.shape, batch_ys.shape)
+    _, loss = sess.run([train_step, cross_entropy],feed_dict={xs: batch_xs, ys: batch_ys, keep_prob: 0.5})
+    if i % 50 == 0:
+        # test_xs, test_ys = sess.run([test_img_batch, test_label_batch])
+        # xs, ys = images_modifier(test_xs, test_ys, batch_size=10000)
+        print('loss: %.3f' % loss)
