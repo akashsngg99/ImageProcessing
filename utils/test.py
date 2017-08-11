@@ -17,8 +17,8 @@ def find_all_serial(string_phase):
             str_tmp += ' '
         else:
             str_tmp += string_phase[i]
-    print(str_tmp)
+    print(str_tmp.split(' '))
 
 if __name__ == '__main__':
-    phs = ": 0.91e-12"
+    phs = ": sf  0.91e-12"
     find_all_serial(phs)
