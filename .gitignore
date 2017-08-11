@@ -1,4 +1,4 @@
-
+utils/deploy.prototxt
 *.png
 
 MNIST_data/train-images-idx3-ubyte

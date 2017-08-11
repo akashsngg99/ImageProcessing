@@ -290,7 +290,7 @@ class Input(Layer):
                 and len(self.layer_string.split("dim:")) >= 2:
             self.name = "data"
             self.type = "Input"
-            self.top = "data_cat"
+            self.top = "data"
             return
         for phase in self.__phases_string:
             if phase == 'bottom':
