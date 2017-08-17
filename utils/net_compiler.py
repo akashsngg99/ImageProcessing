@@ -117,6 +117,7 @@ class Layer(object):
         self.interface_criterion = None
         self.other = None
         self.__init_string_param__()
+        self.__init_top__()
         self.__list_all_member__()
 
     @abstractmethod
@@ -143,8 +144,11 @@ class Layer(object):
             self.bottom = None
         else:
             for index in range(1, bottom_num):
-                bottoms.append(bottoms_tmp[index].split('\"')[1])
+                bottoms.append(bottoms_tmp[index].split('\"')[1]+"_data")
             self.bottom = bottoms
+    
+    def __init_top__(self):
+        self.top += "_data"
 
     def __init_string_param__(self):
         """
@@ -467,11 +471,12 @@ class Crop(Layer):
 
     def __interface_c__(self):
         self.interface_criterion = \
-            "Crop(int axis,int offset,char *bottom1,char *bottom2,...,char *top,char *name)"
+            "Crop(int axis,int offset,int bottom_num,char** bottoms,char *top,char *name)"
         self.interface_c = "Crop("
         self.interface_c += "{},{}".format(self.axis, self.offset)
-        for index in range(len(self.bottom_layer)):
-            self.interface_c += ",\"{}\"".format(self.bottom_layer[index].top)
+        # for index in range(len(self.bottom_layer)):
+        #     self.interface_c += ",\"{}\"".format(self.bottom_layer[index].top)
+        self.interface_c += ",%d,bottom_vector" % len(self.bottom_layer)
         self.interface_c += ",\"{}\"".format(self.top)
         self.interface_c += ",\"{}\");".format(self.name)
 
@@ -511,15 +516,20 @@ class Eltwise(Layer):
 
     def __interface_c__(self):
         self.interface_criterion = \
-            "Eltwise(float coeff1,float coeff2,...,enum EltwiseOp operation," \
-            "bool stabel_prod_grad,char *bottom1,char *bottom2,...,char *top, char *name)"
-        self.interface_c = "Eltwise("
+            "Eltwise(float* coeffs,enum EltwiseOp operation," \
+            "bool stabel_prod_grad,int bottom_num,char **bottoms,char *top, char *name)"
+        self.interface_c = ""
         for index in range(len(self.coeff)):
-            self.interface_c += "{}".format(self.coeff[index])
+            self.interface_c += "coeffs[%d]=%f; " % (index,self.coeff[index])
+        self.interface_c += "\n\tEltwise("
+        # for index in range(len(self.coeff)):
+        #     self.interface_c += "{}".format(self.coeff[index])
+        self.interface_c += "%d,coeffs" % len(self.coeff)
         self.interface_c += ",{}".format(self.operation)
         self.interface_c += ",{}".format(self.stabel_prod_grad)
-        for index in range(len(self.bottom_layer)):
-            self.interface_c += ",\"{}\"".format(self.bottom_layer[index].top)
+        # for index in range(len(self.bottom_layer)):
+        #     self.interface_c += ",\"{}\"".format(self.bottom_layer[index].top)
+        self.interface_c += ",%d,bottom_vector" % len(self.bottom_layer)
         self.interface_c += ",\"{}\"".format(self.top)
         self.interface_c += ",\"{}\");".format(self.name)
 
@@ -661,12 +671,13 @@ class Concat(Layer):
     def __interface_c__(self):
         self.interface_criterion = \
             "Concat(int num_output,int axis,int concat_dim," \
-            "char *bottom,char *top,char *name)"
+            "int bottom_num,char **bottoms,char *top,char *name)"
         self.interface_c = "Concat("
-        self.interface_c += "{}".format(self.num_output)
-        self.interface_c += ",{},{}".format(self.axis,self.concat_dim)
-        for index in range(len(self.bottom_layer)):
-            self.interface_c += ",\"{}\"".format(self.bottom_layer[index].top)
+        self.interface_c += "{},".format(self.num_output)
+        self.interface_c += "{},{}".format(self.axis,self.concat_dim)
+        # for index in range(len(self.bottom_layer)):
+        #     self.interface_c += ",\"{}\"".format(self.bottom_layer[index].top)
+        self.interface_c += ",%d,bottom_vector"%len(self.bottom_layer)
         self.interface_c += ",\"{}\"".format(self.top)
         self.interface_c += ",\"{}\");".format(self.name)
 
@@ -818,7 +829,7 @@ class Net(object):
         self.__link_layers__()
 
         self.__all_layers_type = self.__all_layers_type__()
-        self.__write_c_format__(annotation=False)
+        self.__write_c_format__(annotation=True)
 
     def __update_log__(self, log, printout=False):
         """Print log from here"""
@@ -902,24 +913,43 @@ class Net(object):
         outf = open("{}.c".format(self.__name), 'w+')
         if annotation:
             self.__write_annotations__()
-        line = "#include \"common.h\"\n"
-        self.__update_line__(line, self.__cfile)
-        line = "#include \"interface.h\"\n\n"
-        self.__update_line__(line, self.__cfile)
-        line = "void " + self.__name + "()\n{\n"
-        self.__update_line__(line, self.__cfile)
+        lines = "#include \"common.h\"\n"
+        lines += "#include \"interface.h\"\n\n"
+        lines += "void " + self.__name + "()\n{\n"
+        max_bottom = 1
+        max_len_coeff = 1
+        for index in range(len(self.__layers)):
+            if self.__layers[index].type == "Eltwise":
+                if len(self.__layers[index].coeff) > max_len_coeff:
+                    max_len_coeff = len(self.__layers[index].coeff)
+            if not self.__layers[index].bottom == None:
+                if len(self.__layers[index].bottom) > max_bottom:
+                    max_bottom = len(self.__layers[index].bottom)
+        if max_len_coeff > 1:
+            lines += "\tfloat coeff[%d];\n" % max_len_coeff
+        if max_bottom > 1:
+            lines += "\tchar* bottom_vector[%d];\n\n" % max_bottom
         for index in range(len(self.__layers)):
             if(self.__layers[index].interface_c == None):
                 self.__update_log__("Ignore layer {}.".format(self.__layers[index].name))
                 continue
-            self.__update_line__("\t{}\n".format(self.__layers[index].interface_c), self.__cfile)
-        line = "\n\tsortData(\"{}\");\n".format(self.__layers[-1].top)
-        line += "\tprintData(\"{}\");\n".format(self.__layers[-1].top)
-        line += "\tsaveData(\"{}\");\n\n".format(self.__layers[-1].top)
-        line += "\tFinalize(\"{}\");\n".format(self.__name)
-        self.__update_line__(line, self.__cfile)
-        self.__update_line__("\n\treturn 0;\n}", self.__cfile)
+            if not self.__layers[index].bottom == None:
+                if not len(self.__layers[index].bottom) == 1:
+                    for bottom_i in range(len(self.__layers[index].bottom)):
+                        lines += "\tbottom_vector[%d] = \"%s\";" % (bottom_i,self.__layers[index].bottom[bottom_i])
+                    lines += "\n"
+            lines += "\t{}\n".format(self.__layers[index].interface_c)
+        lines += "\n\tsortData(\"{}\");\n".format(self.__layers[-1].top)
+        lines += "\tprintData(\"{}\");\n".format(self.__layers[-1].top)
+        lines += "\tsaveData(\"{}\");\n\n".format(self.__layers[-1].top)
+        lines += "\tFinalize(\"{}\");\n".format(self.__name)
+        lines += "\n\treturn;\n}"
+        self.__update_line__(lines, self.__cfile)
         outf.writelines(self.__cfile)
+       
+        outf = open("{}.h".format(self.__name), 'w+')
+        line = "extern {}();".format(self.__name)
+        outf.writelines(line)
 
 
 if __name__ == "__main__":
