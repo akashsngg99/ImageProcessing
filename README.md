@@ -1,5 +1,5 @@
 # ImageProcessing
-Image processing by mrlittlepig
+Image processing using tensorflow, useful script stored in utils.
 
 ### 数据读取
 将MNIST_data/mnist_data.zip解压到跟目录
