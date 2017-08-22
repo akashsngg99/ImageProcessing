@@ -18,6 +18,13 @@ import sys
 from abc import abstractmethod
 
 
+def cformatparam(string_param):
+    cformat = ""
+    for cha in string_param:
+        if re.match('^[0-9a-zA-Z]+$', cha):
+            cformat += cha
+    return cformat
+
 def isac(c):
     """
     A simple function, which determine whether the
@@ -471,12 +478,12 @@ class Crop(Layer):
 
     def __interface_c__(self):
         self.interface_criterion = \
-            "Crop(int axis,int offset,int bottom_num,char** bottoms,char *top,char *name)"
+            "Crop(int axis,int offset,char* bottom, char* bottom_mode,char *top,char *name)"
         self.interface_c = "Crop("
         self.interface_c += "{},{}".format(self.axis, self.offset)
-        # for index in range(len(self.bottom_layer)):
-        #     self.interface_c += ",\"{}\"".format(self.bottom_layer[index].top)
-        self.interface_c += ",%d,bottom_vector" % len(self.bottom_layer)
+        for index in range(len(self.bottom_layer)):
+            self.interface_c += ",\"{}\"".format(self.bottom_layer[index].top)
+        #self.interface_c += ",%d,bottom_vector" % len(self.bottom_layer)
         self.interface_c += ",\"{}\"".format(self.top)
         self.interface_c += ",\"{}\");".format(self.name)
 
@@ -516,7 +523,7 @@ class Eltwise(Layer):
 
     def __interface_c__(self):
         self.interface_criterion = \
-            "Eltwise(float* coeffs,enum EltwiseOp operation," \
+            "Eltwise(int coeffs_num, float* coeffs,enum EltwiseOp operation," \
             "bool stabel_prod_grad,int bottom_num,char **bottoms,char *top, char *name)"
         self.interface_c = ""
         for index in range(len(self.coeff)):
@@ -816,7 +823,7 @@ class Net(object):
         self.__loaded = False
         self.__proto = proto
 
-        self.__name = "Net"
+        self.__name = None
         self.__layers_string = None
         self.__layers = []
         self.__layernum = None
@@ -859,6 +866,9 @@ class Net(object):
         if not len(self.__layers_string[0].split("name:")) == 1:
             if not len(self.__layers_string[0].split("name:")[1].split('\"')) == 1:
                 self.__name = self.__layers_string[0].split("name:")[1].split('\"')[1]
+        if self.__name == None:
+            self.__name = input("Please input the net name using \"name\" format:")
+        self.__name = cformatparam(self.__name)
         self.__update_log__("Net has been loaded successfully.")
         self.__loaded = True
 
@@ -914,7 +924,8 @@ class Net(object):
         if annotation:
             self.__write_annotations__()
         lines = "#include \"common.h\"\n"
-        lines += "#include \"interface.h\"\n\n"
+        lines += "#include \"interface.h\"\n"
+        lines += "#include \"caffe.h\"\n\n"
         lines += "void " + self.__name + "()\n{\n"
         max_bottom = 1
         max_len_coeff = 1
@@ -926,7 +937,7 @@ class Net(object):
                 if len(self.__layers[index].bottom) > max_bottom:
                     max_bottom = len(self.__layers[index].bottom)
         if max_len_coeff > 1:
-            lines += "\tfloat coeff[%d];\n" % max_len_coeff
+            lines += "\tfloat coeffs[%d];\n" % max_len_coeff
         if max_bottom > 1:
             lines += "\tchar* bottom_vector[%d];\n\n" % max_bottom
         for index in range(len(self.__layers)):
@@ -934,7 +945,7 @@ class Net(object):
                 self.__update_log__("Ignore layer {}.".format(self.__layers[index].name))
                 continue
             if not self.__layers[index].bottom == None:
-                if not len(self.__layers[index].bottom) == 1:
+                if self.__layers[index].type == "Eltwise" or self.__layers[index].type == "Concat":
                     for bottom_i in range(len(self.__layers[index].bottom)):
                         lines += "\tbottom_vector[%d] = \"%s\";" % (bottom_i,self.__layers[index].bottom[bottom_i])
                     lines += "\n"
@@ -948,7 +959,7 @@ class Net(object):
         outf.writelines(self.__cfile)
        
         outf = open("{}.h".format(self.__name), 'w+')
-        line = "extern {}();".format(self.__name)
+        line = "extern void {}();".format(self.__name)
         outf.writelines(line)
 
 
