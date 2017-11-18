@@ -10,6 +10,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
 import numpy
 import utils.fileUtil as file
 from datasets import base
@@ -70,8 +71,8 @@ def read_data_sets(data_dir,
                    validation_size=5000,
                    seed=None):
 
-    TRAIN = data_dir + 'mnist_train/train.txt'
-    TEST = data_dir + 'mnist_test/test.txt'
+    TRAIN = os.path.join(data_dir, "mnist_train", "train.txt")
+    TEST = os.path.join(data_dir, "mnist_test", "test.txt")
     # from tensorflow.examples.tutorials.mnist import input_data
     # train and test from images and txt labels
     train_images, train_labels = process_images(TRAIN, one_hot=one_hot)

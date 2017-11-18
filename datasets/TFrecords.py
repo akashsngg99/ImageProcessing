@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 2017/5/2 上午11:33
-# @Author  : mrlittlepig
-# @Site    : www.mrlittlepig.xyz
-# @File    : TFrecords.py
-# @Software: PyCharm Community Edition
 
 from __future__ import absolute_import
 from __future__ import division
@@ -15,7 +10,6 @@ import tensorflow as tf
 import utils.fileUtil as file
 from utils.labelFile2Map import *
 from PIL import Image
-import six
 
 imageSZ = {'rows': 28, 'cols': 28}
 
@@ -80,7 +74,7 @@ def recordsReader(filename):
         }
     )
     image = tf.decode_raw(features['bytesImg'], tf.uint8)
-    image = tf.reshape(image, [imageSZ['rows'] * imageSZ['cols']])
+    image = tf.reshape(image, [imageSZ['rows'],imageSZ['cols']])
     label = tf.cast(features['label'], tf.int32)
     return image, label
 
@@ -92,18 +86,19 @@ def test_reader(recordsFile):
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord)
         for i in range(1):
-            example, l = sess.run([image, label])  # 在会话中取出image和label
+            image, label = sess.run([image, label])  # 在会话中取出image和label
             # img = Image.fromarray(example, 'RGB')  # 如果img是RGB图像
             # img = Image.fromarray(example)
+            #
             # img.save('./' + '_'+'Label_' + str(l) + '.jpg')  # 存下图片
-            print(example, l)
+            Image._show(Image.fromarray(image))
         coord.request_stop()
         coord.join(threads)
 
 if __name__ == '__main__':
     test_label_file, test_dst_records = "../MNIST_data/mnist_test/test.txt", "../MNIST_data/mnist_test.tfrecords"
-    train_label_file, train_dst_records = "../MNIST_data/mnist_train/train.txt", "../MNIST_data/mnist_train.tfrecords"
-    recordsCreater(test_label_file, test_dst_records)
-    recordsCreater(train_label_file, train_dst_records)
+    # train_label_file, train_dst_records = "../MNIST_data/mnist_train/train.txt", "../MNIST_data/mnist_train.tfrecords"
+    # recordsCreater(test_label_file, test_dst_records)
+    # recordsCreater(train_label_file, train_dst_records)
     test_reader(test_dst_records)
     # print(dense_to_one_hot(1, 10))
