@@ -18,6 +18,27 @@ Using TFRecord data:
 2. Using TFRecord data type.  
 [classifier.py](https://github.com/mrlittlepig/ImageProcessing/blob/master/classifier.py)  
 
+## Prediction
+Prediction and export_inference_graph in evaluation.py.  
+[evaluation.py](https://github.com/mrlittlepig/ImageProcessing/blob/master/evaluation.py)  
+If you need inference graph for OpenCV dnn using, you can see example of export_inference_graph at this code.  
+Predict single image example as  
+```Python  
+def predict(image_path):
+	...
+	return result
+```  
+Also for predict batch images as  
+```Python
+def predict_batch(images_dir):
+	...
+	return results
+```
+but notice that predict_batch returns results is a matrix, you can see it's shape by  
+```Python
+print(np.asarray(results).shape)
+```
+
 ## Net
 Lenet:  
 [net/lenet.py](https://github.com/mrlittlepig/ImageProcessing/blob/master/net/lenet.py)  
