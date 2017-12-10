@@ -34,7 +34,7 @@ def predict_batch(images_dir):
 	...
 	return results
 ```
-but notice that predict_batch returns results is a matrix, you can see it's shape by  
+Notice that predict_batch returns a matrix, you can see it's shape by  
 ```Python
 print(np.asarray(results).shape)
 ```
