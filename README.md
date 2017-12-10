@@ -43,7 +43,9 @@ print(np.asarray(results).shape)
 Lenet:  
 [net/lenet.py](https://github.com/mrlittlepig/ImageProcessing/blob/master/net/lenet.py)  
 Training Lenet by classifier.py  
+```bash
 $ cd ImageProcessing  
 $ python classifier.py  
+```
 
 [Chinese blog](https://mrlittlepig.github.io/2017/04/30/tensorflow-for-image-processing/)
