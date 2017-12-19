@@ -1,6 +1,8 @@
 utils/deploy.prototxt
 *.png
-
+datasets/actions/
+data/
+.idea/
 MNIST_data/train-images-idx3-ubyte
 
 *.gz

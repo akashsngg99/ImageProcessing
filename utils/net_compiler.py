@@ -80,7 +80,7 @@ class LayerFactory(object):
     __layer_register = ['Input', 'Convolution', 'Deconvolution', 'Pooling',
                         'Crop', 'Eltwise', 'ArgMax', 'BatchNorm', 'Concat',
                         'Scale', 'Sigmoid', 'Softmax', 'TanH', 'ReLU', 'LRN',
-                        'InnerProduct', 'Dropout']
+                        'InnerProduct', 'Dropout', 'ROIPooling']
 
     def __init__(self, layer_string=None):
         self.layer_string = layer_string
@@ -815,9 +815,34 @@ class Dropout(Layer):
     def __init__(self, layer_string):
         Layer.__init__(self, layer_string)
 
+class ROIPooling(Layer):
+    """ROIPooling layer"""
+
+    __phases_number = ['pooled_h', 'pooled_w']
+    __phases_decimal = ['spatial_scale']
+    def __init__(self, layer_string):
+        Layer.__init__(self, layer_string)
+        self.pooled_h = 0
+        self.pooled_w = 0
+        self.spatial_scale = 1.0
+
+    def __calc_ioput__(self):
+        self.num_input = self.bottom_layer[0].num_output
+        self.num_output = self.num_input
+
+    def __interface_c__(self):
+        self.interface_criterion = \
+            "ROIPooling(int pooled_h,int pooled_w,float spatial_scale,char *bottom,char *top,char *name)"
+        self.interface_c = "ROIPooling("
+        self.interface_c += "{},{},{}".format(self.pooled_h, self.pooled_w, self.spatial_scale)
+        for index in range(len(self.bottom_layer)):
+            self.interface_c += ",\"{}\"".format(self.bottom_layer[index].top)
+        self.interface_c += ",\"{}\"".format(self.top)
+        self.interface_c += ",\"{}\");".format(self.name)
 
 class Net(object):
     """Convert caffe net protobuf file to inferxlite net.c file"""
+
 
     def __init__(self, proto=None):
         self.__loaded = False
