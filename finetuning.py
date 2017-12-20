@@ -88,8 +88,10 @@ def main():
       'No TFRecord file exists.')
 
   # Create the Estimator
+  runconfig = tf.estimator.RunConfig().replace(save_checkpoint_step=1)
   classifier = tf.estimator.Estimator(
       model_fn=model_fn, model_dir=init_params['net_params']['model_dir'],
+      config=runconfig,
       params={'data_format': init_params['data_params']['data_format'],
               'num_classes': init_params['data_params']['num_classes'],
               'batch_size': init_params['batch_size'],
