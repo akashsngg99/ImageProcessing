@@ -25,7 +25,7 @@ model_params = {
       data_params['model_root'],
       'lenet'
     ),
-    'checkpoint_index': 66000
+    'checkpoint_index': 72000
   }
 }
 
@@ -86,8 +86,9 @@ def predict(image_path):
   x = tf.placeholder(name=graph_params["input_nodes"], dtype=tf.float32,
                                shape=[None, 28, 28, 1])
 
-  image = cv2.imread(image_path)
-  image = np.resize(image, [1, 28, 28, 1])
+  image = cv2.imread(image_path, 0)
+
+  image = np.reshape(image, [1, 28, 28, 1])
   with tf.Session() as sess:
     y = inference_fn(x)
     sess.run(tf.global_variables_initializer())
@@ -105,12 +106,12 @@ def predict_batch(images_dir):
     if not file.split('.')[-1] == 'png':
       continue
 
-    images.append(cv2.imread(os.path.join(images_dir, file)))
+    images.append(cv2.imread(os.path.join(images_dir, file), 0))
 
   xs = tf.placeholder(name=graph_params["input_nodes"], dtype=tf.float32,
                      shape=[None, 28, 28, 1])
   images = np.asarray(images)
-  images = np.resize(images, [len(images), 28, 28, 1])
+  images = np.reshape(images, [len(images), 28, 28, 1])
 
   with tf.Session() as sess:
     ys = inference_fn(xs)
@@ -124,7 +125,7 @@ def predict_batch(images_dir):
 
 
 if __name__ == "__main__":
-  # image_path = "MNIST_data/mnist_test/0/mnist_test_3.png"
+  # image_path = "MNIST_data/mnist_train/0/mnist_train_34.png"
   # print(predict(image_path))
   images_path = "MNIST_data/mnist_test/1/"
   results = predict_batch(images_path)
