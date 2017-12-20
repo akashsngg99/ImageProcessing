@@ -25,7 +25,7 @@ model_params = {
       data_params['model_root'],
       'lenet'
     ),
-    'checkpoint_index': 10527
+    'checkpoint_index': 66000
   }
 }
 
@@ -119,18 +119,17 @@ def predict_batch(images_dir):
     saver = tf.train.Saver()
     saver.restore(sess, graph_params["source_checkpoint"])
     print("Model restored.")
-    results = sess.run([ys], feed_dict={xs: images})
+    results = sess.run(ys, feed_dict={xs: images})
     return results
 
 
 if __name__ == "__main__":
   # image_path = "MNIST_data/mnist_test/0/mnist_test_3.png"
   # print(predict(image_path))
-  images_path = "MNIST_data/mnist_test/0/"
+  images_path = "MNIST_data/mnist_test/1/"
   results = predict_batch(images_path)
   results = np.asarray(results)
   print(np.asarray(results).shape)
   for result in results:
-    for result_i in result:
-      print(result_i)
+    print(result)
 

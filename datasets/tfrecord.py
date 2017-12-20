@@ -7,6 +7,8 @@ from __future__ import print_function
 
 import numpy as np
 import tensorflow as tf
+import sys
+sys.path.append('../')
 import utils.fileUtil as file
 from utils.labelFile2Map import *
 from PIL import Image
@@ -97,8 +99,8 @@ def test_reader(recordsFile):
 
 if __name__ == '__main__':
     test_label_file, test_dst_records = "../MNIST_data/mnist_test/test.txt", "../MNIST_data/mnist_test.tfrecords"
-    # train_label_file, train_dst_records = "../MNIST_data/mnist_train/train.txt", "../MNIST_data/mnist_train.tfrecords"
-    # recordsCreater(test_label_file, test_dst_records)
-    # recordsCreater(train_label_file, train_dst_records)
-    test_reader(test_dst_records)
+    train_label_file, train_dst_records = "../MNIST_data/mnist_train/train.txt", "../MNIST_data/mnist_train.tfrecords"
+    recordsCreater(test_label_file, test_dst_records)
+    recordsCreater(train_label_file, train_dst_records)
+    # test_reader(test_dst_records)
     # print(dense_to_one_hot(1, 10))

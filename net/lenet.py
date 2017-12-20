@@ -81,7 +81,7 @@ def model_fn(features, labels, mode, params):
 
   # Configure the training op
   if mode == tf.estimator.ModeKeys.TRAIN:
-    optimizer = tf.train.AdamOptimizer(learning_rate=1e-4)
+    optimizer = tf.train.AdamOptimizer(learning_rate=1e-5)
     train_op = optimizer.minimize(loss, tf.train.get_or_create_global_step())
   else:
     train_op = None

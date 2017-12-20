@@ -31,7 +31,7 @@ net_params = {
 
 init_params = {
   'batch_size': 10,
-  'train_epoch': 10,
+  'train_epoch': 6,
   'data_params': data_params,
   'net_params': net_params['lenet'],
 }
@@ -104,17 +104,18 @@ def main():
   logging_hook = tf.train.LoggingTensorHook(
       tensors=tensors_to_log, every_n_iter=50)
 
-  # Train the model
-  classifier.train(
+  for e in range(init_params['train_epoch']):
+    # Train the model
+    classifier.train(
       input_fn=lambda: input_fn(
-          True, train_file, init_params['batch_size'], init_params['train_epoch']),
+          True, train_file, init_params['batch_size'], 1),
       hooks=[logging_hook])
 
   # Evaluate the model and print results
-  eval_results = classifier.evaluate(
+    eval_results = classifier.evaluate(
       input_fn=lambda: input_fn(False, test_file, init_params['batch_size']))
-  print()
-  print('Evaluation results:\n\t%s' % eval_results)
+    print()
+    print('Evaluation results:\n\t%s' % eval_results)
 
 
 if __name__ == '__main__':
