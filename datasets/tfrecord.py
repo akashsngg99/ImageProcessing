@@ -7,10 +7,14 @@ from __future__ import print_function
 
 import numpy as np
 import tensorflow as tf
+import os
+import cv2
+
 import sys
 sys.path.append('../')
 import utils.fileUtil as file
 from utils.labelFile2Map import *
+from utils.copy import get_file_list
 from PIL import Image
 
 imageSZ = {'rows': 28, 'cols': 28}
@@ -97,10 +101,34 @@ def test_reader(recordsFile):
         coord.request_stop()
         coord.join(threads)
 
+def tfrecord_finetuning(dataset, dst_record):
+    writer = tf.python_io.TFRecordWriter(dst_record)
+
+    filelist = get_file_list(dataset)
+    for name in filelist:
+        if not name.split('.') == 'jpg':
+            continue
+        path = os.path.join(dataset, name)
+        image = cv2.imread(path)
+        image = cv2.resize(image, (imageSZ['rows'], imageSZ['cols']), interpolation=cv2.INTER_AREA)
+        bytesImg = image.tobytes()
+        label = int(name[0])
+        print(label)
+        example = tf.train.Example(
+            features=tf.train.Features(feature={
+                "label": tf.train.Feature(int64_list=tf.train.Int64List(value=[label])),
+                'bytesImg': tf.train.Feature(bytes_list=tf.train.BytesList(value=[bytesImg]))
+            }))
+        writer.write(example.SerializeToString())
+    print("done!")
+    writer.close()
+
+
 if __name__ == '__main__':
     test_label_file, test_dst_records = "../MNIST_data/mnist_test/test.txt", "../MNIST_data/mnist_test.tfrecords"
     train_label_file, train_dst_records = "../MNIST_data/mnist_train/train.txt", "../MNIST_data/mnist_train.tfrecords"
-    recordsCreater(test_label_file, test_dst_records)
-    recordsCreater(train_label_file, train_dst_records)
+    # recordsCreater(test_label_file, test_dst_records)
+    # recordsCreater(train_label_file, train_dst_records)
     # test_reader(test_dst_records)
     # print(dense_to_one_hot(1, 10))
+    tfrecord_finetuning('../MNIST_data/fine_tuning','../MNIST_data/fine_tuning/train.tfrecord')

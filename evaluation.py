@@ -99,13 +99,13 @@ def predict(image_path):
     result = sess.run([y], feed_dict={x: image})
     return result
 
-def predict_batch(images_dir):
+def predict_batch(images_dir, phase='png'):
   file_list = get_file_list(images_dir)
   images = []
   for file in file_list:
-    if not file.split('.')[-1] == 'png':
+    if not file.split('.')[-1] == phase:
       continue
-
+    print(file)
     images.append(cv2.imread(os.path.join(images_dir, file), 0))
 
   xs = tf.placeholder(name=graph_params["input_nodes"], dtype=tf.float32,
@@ -127,8 +127,8 @@ def predict_batch(images_dir):
 if __name__ == "__main__":
   # image_path = "MNIST_data/mnist_train/0/mnist_train_34.png"
   # print(predict(image_path))
-  images_path = "MNIST_data/mnist_test/1/"
-  results = predict_batch(images_path)
+  images_path = "MNIST_data/fine_tuning"
+  results = predict_batch(images_path, 'jpg')
   results = np.asarray(results)
   print(np.asarray(results).shape)
   for result in results:
