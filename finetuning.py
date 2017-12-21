@@ -14,8 +14,8 @@ data_params = {
   'num_classes': 10,
   'image_size': [28, 28],
   'num_images': {
-    'train': 264,
-    'validation': 264
+    'train': 679,
+    'validation': 679
   }
 }
 
@@ -30,7 +30,7 @@ net_params = {
 }
 
 init_params = {
-  'batch_size': 40,
+  'batch_size': 679,
   'train_epoch': 10,
   'data_params': data_params,
   'net_params': net_params['lenet'],
