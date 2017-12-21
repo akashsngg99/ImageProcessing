@@ -14,7 +14,7 @@ data_params = {
   'num_classes': 10,
   'image_size': [28, 28],
   'num_images': {
-    'train': 32,
+    'train': 16,
     'validation': 32
   }
 }
@@ -30,8 +30,8 @@ net_params = {
 }
 
 init_params = {
-  'batch_size': 32,
-  'train_epoch': 2,
+  'batch_size': 10,
+  'train_epoch': 20000,
   'data_params': data_params,
   'net_params': net_params['lenet'],
 }
@@ -88,16 +88,16 @@ def main():
       'No TFRecord file exists.')
 
   # Create the Estimator
-  runconfig = tf.estimator.RunConfig().replace(save_checkpoint_step=1)
+  # runconfig = tf.estimator.RunConfig().replace(save_checkpoints_steps=1)
   classifier = tf.estimator.Estimator(
       model_fn=model_fn, model_dir=init_params['net_params']['model_dir'],
-      config=runconfig,
       params={'data_format': init_params['data_params']['data_format'],
               'num_classes': init_params['data_params']['num_classes'],
               'batch_size': init_params['batch_size'],
               'net_params': init_params['net_params'],
               'num_images': init_params['data_params']['num_images']
               })
+
 
   # Set up training hook that logs the training accuracy every 100 steps.
   tensors_to_log = {
@@ -114,10 +114,10 @@ def main():
       hooks=[logging_hook])
 
   # Evaluate the model and print results
-    eval_results = classifier.evaluate(
-      input_fn=lambda: input_fn(False, test_file, init_params['batch_size']))
-    print()
-    print('Evaluation results:\n\t%s' % eval_results)
+  #   eval_results = classifier.evaluate(
+  #     input_fn=lambda: input_fn(False, test_file, init_params['batch_size']))
+  #   print()
+  #   print('Evaluation results:\n\t%s' % eval_results)
 
 
 if __name__ == '__main__':

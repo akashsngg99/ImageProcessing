@@ -7,6 +7,7 @@ import os
 import net.lenet as lenet
 import cv2
 from utils.copy import get_file_list
+from PIL import Image
 
 from tensorflow.python.platform import gfile
 
@@ -106,7 +107,9 @@ def predict_batch(images_dir, phase='png'):
     if not file.split('.')[-1] == phase:
       continue
     print(file)
-    images.append(cv2.imread(os.path.join(images_dir, file), 0))
+    img = cv2.imread(os.path.join(images_dir, file), 0)
+    # image = Image.open(os.path.join(images_dir, file))
+    images.append(np.array(img))
 
   xs = tf.placeholder(name=graph_params["input_nodes"], dtype=tf.float32,
                      shape=[None, 28, 28, 1])

@@ -106,11 +106,11 @@ def tfrecord_finetuning(dataset, dst_record):
 
     filelist = get_file_list(dataset)
     for name in filelist:
-        if not name.split('.') == 'jpg':
+        if not name.split('.')[1] == 'jpg':
             continue
         path = os.path.join(dataset, name)
-        image = cv2.imread(path)
-        image = cv2.resize(image, (imageSZ['rows'], imageSZ['cols']), interpolation=cv2.INTER_AREA)
+        image = cv2.imread(path, 0)
+        #image = cv2.resize(image, (imageSZ['rows'], imageSZ['cols']), interpolation=cv2.INTER_AREA)
         bytesImg = image.tobytes()
         label = int(name[0])
         print(label)
