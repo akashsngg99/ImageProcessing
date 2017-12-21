@@ -14,8 +14,8 @@ data_params = {
   'num_classes': 10,
   'image_size': [28, 28],
   'num_images': {
-    'train': 16,
-    'validation': 32
+    'train': 264,
+    'validation': 264
   }
 }
 
@@ -30,8 +30,8 @@ net_params = {
 }
 
 init_params = {
-  'batch_size': 10,
-  'train_epoch': 20000,
+  'batch_size': 40,
+  'train_epoch': 10,
   'data_params': data_params,
   'net_params': net_params['lenet'],
 }
@@ -114,10 +114,10 @@ def main():
       hooks=[logging_hook])
 
   # Evaluate the model and print results
-  #   eval_results = classifier.evaluate(
-  #     input_fn=lambda: input_fn(False, test_file, init_params['batch_size']))
-  #   print()
-  #   print('Evaluation results:\n\t%s' % eval_results)
+    eval_results = classifier.evaluate(
+      input_fn=lambda: input_fn(False, test_file, init_params['batch_size']))
+    print()
+    print('Evaluation results:\n\t%s' % eval_results)
 
 
 if __name__ == '__main__':

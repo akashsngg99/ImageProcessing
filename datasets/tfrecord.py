@@ -103,24 +103,27 @@ def test_reader(recordsFile):
 
 def tfrecord_finetuning(dataset, dst_record):
     writer = tf.python_io.TFRecordWriter(dst_record)
-
-    filelist = get_file_list(dataset)
-    for name in filelist:
-        if not name.split('.')[1] == 'jpg':
-            continue
-        path = os.path.join(dataset, name)
-        image = cv2.imread(path, 0)
-        #image = cv2.resize(image, (imageSZ['rows'], imageSZ['cols']), interpolation=cv2.INTER_AREA)
-        bytesImg = image.tobytes()
-        label = int(name[0])
-        print(label)
-        example = tf.train.Example(
-            features=tf.train.Features(feature={
-                "label": tf.train.Feature(int64_list=tf.train.Int64List(value=[label])),
-                'bytesImg': tf.train.Feature(bytes_list=tf.train.BytesList(value=[bytesImg]))
-            }))
-        writer.write(example.SerializeToString())
-    print("done!")
+    num = 0
+    for i in range(10):
+        index_dir = os.path.join(dataset, '%d'%i)
+        filelist = get_file_list(index_dir)
+        for name in filelist:
+            num+=1
+            if not name.split('.')[1] == 'jpg':
+                continue
+            path = os.path.join(index_dir, name)
+            image = cv2.imread(path, 0)
+            #image = cv2.resize(image, (imageSZ['rows'], imageSZ['cols']), interpolation=cv2.INTER_AREA)
+            bytesImg = image.tobytes()
+            label = i
+            print(label)
+            example = tf.train.Example(
+                features=tf.train.Features(feature={
+                    "label": tf.train.Feature(int64_list=tf.train.Int64List(value=[label])),
+                    'bytesImg': tf.train.Feature(bytes_list=tf.train.BytesList(value=[bytesImg]))
+                }))
+            writer.write(example.SerializeToString())
+    print(num)
     writer.close()
 
 
