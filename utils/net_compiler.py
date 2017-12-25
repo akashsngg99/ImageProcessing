@@ -1,17 +1,3 @@
-"""
-    net_compiler.py
-    Copyright 2017 Junhui Zhang <mrlittlezhu@gmail.com>
-    Portions Copyright 2017 Xianyi Zhang <http://xianyi.github.io> and Chaowei Wang <wangchaowei@ncic.ac.cn>
-
-This script made to build caffe net protobuf file to inferxlite[website] .c file
-
-"""
-
-__author__ = "Junhui Zhang <https://mrlittlepig.github.io>"
-__version__ = "0.1"
-__date__ = "March 4,2017"
-__copyright__ = "Copyright: 2017 Junhui Zhang; Portions: 2017 Xianyi Zhang <http://xianyi.github.io>; Portions: 2017 Chaowei Wang;"
-
 import re
 import sys
 
