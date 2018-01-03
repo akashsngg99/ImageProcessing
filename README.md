@@ -4,23 +4,23 @@ Image processing using tensorflow, useful script stored in utils.
 ## About data util
 Unpack MNIST_data/mnist_data.zip to current dir  
 Labels:  
-[utils/genFileList.py](https://github.com/mrlittlepig/ImageProcessing/blob/master/utils/genFileList.py)  
+[genFileList.py](utils/genFileList.py)  
 Labels to dict:  
-[utils/labelFile2Map.py](https://github.com/mrlittlepig/ImageProcessing/blob/master/utils/labelFile2Map.py)  
+[labelFile2Map.py](utils/labelFile2Map.py)  
 Gen training datasets:  
-[datasets/imnist.py](https://github.com/mrlittlepig/ImageProcessing/blob/master/datasets/imnist.py)  
+[imnist.py](datasets/imnist.py)  
 Using TFRecord data:  
-[tfrecord.py](https://github.com/mrlittlepig/ImageProcessing/blob/master/datasets/tfrecord.py)
+[tfrecord.py](datasets/tfrecord.py)
 
 ## Training
 1. Using images data.  
-[classification.py](https://github.com/mrlittlepig/ImageProcessing/blob/master/classification.py)  
+[classification.py](classification.py)  
 2. Using TFRecord data type.  
-[classifier.py](https://github.com/mrlittlepig/ImageProcessing/blob/master/classifier.py)  
+[classifier.py](classifier.py)  
 
 ## Prediction
 Prediction and export_inference_graph in evaluation.py.  
-[evaluation.py](https://github.com/mrlittlepig/ImageProcessing/blob/master/evaluation.py)  
+[evaluation.py](evaluation.py)  
 If you need inference graph for OpenCV dnn using, you can see example of export_inference_graph at this code.  
 Predict single image example as  
 ```Python  
@@ -41,7 +41,7 @@ print(np.asarray(results).shape)
 
 ## Net
 Lenet:  
-[net/lenet.py](https://github.com/mrlittlepig/ImageProcessing/blob/master/net/lenet.py)  
+[lenet.py](net/lenet.py)  
 Training Lenet by classifier.py  
 ```bash
 $ cd ImageProcessing  
