@@ -2,7 +2,7 @@
 Image processing using tensorflow, useful script stored in utils.
 
 ## About data util
-Unpack MNIST_data/mnist_data.zip to MNIST_data directory  
+Unpack MNIST_data/mnist_data.zip to MNIST_data directory  
 Labels:  
 [genFileList.py](utils/genFileList.py)  
 Labels to dict:  
