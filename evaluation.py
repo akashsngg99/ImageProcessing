@@ -6,7 +6,7 @@ import numpy as np
 import os
 import net.lenet as lenet
 import cv2
-from utils.copy import get_file_list
+from utils.file_copy import get_file_list
 from PIL import Image
 
 from tensorflow.python.platform import gfile
@@ -26,7 +26,7 @@ model_params = {
       data_params['model_root'],
       'lenet'
     ),
-    'checkpoint_index': 72000
+    'checkpoint_index': 36000
   }
 }
 
@@ -96,6 +96,7 @@ def predict(image_path):
 
     saver = tf.train.Saver()
     saver.restore(sess, graph_params["source_checkpoint"])
+
     print("Model restored.")
     result = sess.run([y], feed_dict={x: image})
     return result
@@ -122,6 +123,9 @@ def predict_batch(images_dir, phase='png'):
 
     saver = tf.train.Saver()
     saver.restore(sess, graph_params["source_checkpoint"])
+
+
+
     print("Model restored.")
     results = sess.run(ys, feed_dict={xs: images})
     return results
@@ -130,10 +134,10 @@ def predict_batch(images_dir, phase='png'):
 if __name__ == "__main__":
   # image_path = "MNIST_data/mnist_train/0/mnist_train_34.png"
   # print(predict(image_path))
-  images_path = "MNIST_data/fine_tuning"
+  images_path = "MNIST_data/fine_tuning/0"
   results = predict_batch(images_path, 'jpg')
   results = np.asarray(results)
-  print(np.asarray(results).shape)
-  for result in results:
-    print(result)
+  # print(np.asarray(results).shape)
+  # for result in results:
+    # print(result)
 

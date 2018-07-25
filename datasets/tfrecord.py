@@ -14,7 +14,7 @@ import sys
 sys.path.append('../')
 import utils.fileUtil as file
 from utils.labelFile2Map import *
-from utils.copy import get_file_list
+from utils.file_copy import get_file_list
 from PIL import Image
 
 imageSZ = {'rows': 28, 'cols': 28}

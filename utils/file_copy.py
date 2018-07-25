@@ -36,7 +36,7 @@ def rename_images(img_dir, dst_dir, bak_end = "jpg"):
         img = cv2.imread(image_path)
         dst_path = os.path.join(dst_dir,("%05d." % count)+bak_end)
         cv2.imwrite(dst_path, img)
-        print dst_path
+        print(dst_path)
 
 def read_image_mat(src_img):
     img = cv2.imread(src_img)
