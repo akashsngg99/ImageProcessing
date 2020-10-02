@@ -1,5 +1,5 @@
 # ImageProcessing
-Image processing using tensorflow, useful script stored in utils.
+Image processing using tensorflow and sklearn, useful script stored in utils.
 
 ## About data util
 Unpack MNIST_data/mnist_data.zip to MNIST_data directory  
